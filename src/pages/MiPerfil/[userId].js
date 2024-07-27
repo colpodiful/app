@@ -10,14 +10,16 @@ const MiPerfil = () => {
     const [usuarios, setUsuarios] = useState([]);
     const router = useRouter();
     const userId = useUserStore((state) => state.userId);
-    const dato = localStorage.getItem('userlogin');
+    const [dato, setDato] = useState(null);
 
     useEffect(() => {
-        try {
-            const dato = localStorage.getItem('userlogin');
-        } catch (error) {
-            console.log('error', error);
-        } finally {}
+        if (typeof window !== "undefined") {
+            const storedDato = localStorage.getItem('userlogin');
+            setDato(storedDato);
+        }
+    }, []);
+
+    useEffect(() => {
         const fetchUsuarios = async () => {
             try {
                 let { data: usuarios, error } = await supabase
@@ -33,12 +35,14 @@ const MiPerfil = () => {
             }
         };
 
-        fetchUsuarios();
-    }, [userId]);
+        if (dato) {
+            fetchUsuarios();
+        }
+    }, [dato]);
 
     return (
         <>
-            <NavAvanzado  userId={userId}/>
+            <NavAvanzado userId={userId} />
             <div className={styles.container}>
                 <h1 className={styles.title}>Profilo Utente</h1>
                 {usuarios.map((usuario) => (
